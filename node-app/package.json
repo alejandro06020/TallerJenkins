@@ -1,0 +1,11 @@
+{
+  "name": "node-app",
+  "version": "1.0.0",
+  "description": "Ejemplo simple para pipeline con Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No hay tests definidos aún\" && exit 0"
+  },
+  "author": "Tú",
+  "license": "MIT"
+}
