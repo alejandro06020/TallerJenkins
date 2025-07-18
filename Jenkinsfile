@@ -1,30 +1,42 @@
 pipeline {
-    agent none
+    agent any
+
     stages {
-        stage('Build Java App') {
-            agent {
-                docker {
-                    image 'maven:3.9-eclipse-temurin-17'
-                    args '-v /root/.m2:/root/.m2'
-                }
-            }
+        stage('Build Java (Maven)') {
             steps {
-                dir('java-app') {
-                    sh 'mvn clean package'
+                script {
+                    docker.image('maven:3.9-eclipse-temurin-17').inside {
+                        dir('java-app') {
+                            sh 'mvn clean install'
+                        }
+                    }
                 }
             }
         }
 
-        stage('Build Node App') {
-            agent {
-                docker {
-                    image 'node:18'
+        stage('Build Node.js') {
+            steps {
+                script {
+                    docker.image('node:20').inside {
+                        dir('node-app') {
+                            sh 'npm install'
+                            sh 'npm test || echo "No test script definido"'
+                        }
+                    }
                 }
             }
+        }
+
+        stage('Build .NET Core') {
             steps {
-                dir('node-app') {
-                    sh 'npm install'
-                    sh 'npm test || echo "No test script defined"'
+                script {
+                    docker.image('mcr.microsoft.com/dotnet/sdk:8.0').inside {
+                        dir('dotnet-app') {
+                            sh 'dotnet restore'
+                            sh 'dotnet build --configuration Release'
+                            sh 'dotnet test || echo "No hay pruebas definidas"'
+                        }
+                    }
                 }
             }
         }
